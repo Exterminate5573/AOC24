@@ -1,4 +1,26 @@
-#Incomplete
+
+#WIP
+
+def check_vals(num1, num2, is_first, is_increasing):
+    if is_increasing:
+        if num1 >= num2:
+            is_safe = False
+        else:
+            diff = num2 - num1
+
+            if diff > 3:
+                is_safe = False
+    else:
+        if num1 <= num2:
+            is_safe = False
+        else:
+            diff = num1 - num2
+
+            if diff > 3:
+                is_safe = False
+
+    return is_safe
+
 total_safe = 0
 
 with open("day2/input.txt") as input:
@@ -7,76 +29,38 @@ with open("day2/input.txt") as input:
         for i in line.split(" "):
             numlist.append(int(i))
 
-        dampened = False
         is_first = True
         is_safe = True
         is_increasing = True
-        curr_num = numlist.pop()
-        while len(numlist) > 0:
-            num1 = curr_num
-            num2 = numlist.pop()
+        dampened = False
+        for i in range(len(numlist) - 1):
+            num1 = numlist[i]
+            num2 = numlist[i + 1]
 
-            if is_first:
-                if num1 < num2:
-                    is_increasing = True
-                elif num1 > num2:
-                    is_increasing = False
-                else:
-                    if not dampened:
-                        curr_num = num2
-                        dampened = True
-                        continue
-                    else:
-                        is_safe = False
-                        break
+            safe = check_vals(num1, num2, is_first, is_increasing)
 
-                is_first = False
+            if not safe and not dampened:
+                try:
+                    new_check1 = check_vals(num1, numlist[i + 2], is_first, is_increasing)
+                except:
+                    new_check1 = False
 
-            if is_increasing:
-                if num1 >= num2:
-                    if not dampened:
-                        curr_num = num2
-                        dampened = True
-                        continue
-                    else:
-                        is_safe = False
-                        break
-                else:
-                    diff = num2 - num1
+                try:
+                    new_check2 = check_vals(numlist[i - 1], num2, is_first, is_increasing)
+                except:
+                    new_check2 = False
 
-                    if diff > 3:
-                        if not dampened:
-                            curr_num = num2
-                            dampened = True
-                            continue
-                        else:
-                            is_safe = False
-                            break
-            else:
-                if num1 <= num2:
-                    if not dampened:
-                        curr_num = num2
-                        dampened = True
-                        continue
-                    else:
-                        is_safe = False
-                        break
-                else:
-                    diff = num1 - num2
+                if new_check1 or new_check2:
+                    safe = True
+                    dampened = True
 
-                    if diff > 3:
-                        if not dampened:
-                            curr_num = num2
-                            dampened = True
-                            continue
-                        else:
-                            is_safe = False
-                            break
-            
-            curr_num = num2
-        
+            if not safe:
+                is_safe = False
+
         if is_safe:
             total_safe += 1
 
 
 print(total_safe)
+
+        
